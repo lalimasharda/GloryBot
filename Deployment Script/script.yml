@@ -1,0 +1,61 @@
+- name: Playbook to configure environment
+  hosts: 3.86.38.147
+
+  vars:
+    home: "{{ ansible_env.HOME }}"
+    # replace with your git test account's personal access token
+    token: GIT_TOKEN
+  
+  tasks:
+    - name: add ppa for installing nodejs
+      shell: curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
+      become: true
+
+    - name: Install Nodejs
+      apt: name=nodejs
+      become: true
+      
+    - name: Install Git
+      apt: name=git
+      become: true
+    
+    - name: Install forever
+      npm: name=forever global=yes state=present
+      become: true
+
+    - name: Adding the path in the bashrc files
+      lineinfile: dest={{ home }}/.bashrc line='export ENV_CLIENT_ID=767362224017.791575114325' insertafter='EOF' state=present
+    
+    - name: Adding the path in the bashrc files
+      lineinfile: dest={{ home }}/.bashrc line='export ENV_CLIENT_SECRET=c8d211f1ef7e1146365fde5213bd7056' insertafter='EOF' state=present
+    
+    - name: Adding the path in the bashrc files
+      lineinfile: dest={{ home }}/.bashrc line='export ENV_REDIRECT_URL=http://3.86.38.147:3000' insertafter='EOF' state=present
+    
+    - name: Adding the path in the bashrc files
+      lineinfile: dest={{ home }}/.bashrc line='export BOT_TOKEN=BOT-TOKEN' insertafter='EOF' state=present
+    
+    - name: Adding the path in the bashrc files
+      lineinfile: dest={{ home }}/.bashrc line='export GIT_TOKEN=GIT-TOKEN' insertafter='EOF' state=present
+      
+    - name: Fetch codebase from GitHub
+      git:  
+        repo: 'https://{{ token }}:x-oauth-basic@github.ncsu.edu/csc510-fall2019/CSC510-6.git'
+        dest: '{{ home }}/GloryBot'
+        update: yes
+      ignore_errors: true
+
+    - name: "Install packages"
+      npm:
+        path: GloryBot/
+
+
+    - name: "Check list of Node.js or forever apps running."
+      command: forever list
+      register: forever_list
+      changed_when: false
+
+
+    - name: "run forever"
+      shell: . {{ home }}/.bashrc && forever start -al {{ home }}/out.log GloryBot/RewardBot/server.js
+      when: "forever_list.stdout.find('GloryBot/RewardBot/server.js') == -1"

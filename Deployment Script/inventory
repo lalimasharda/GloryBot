@@ -1,0 +1,2 @@
+[webservers]
+3.86.38.147 ansible_ssh_private_key_file=/home/lalima/Downloads/gloryBot_AWS.pem ansible_user=ubuntu ansible_python_interpreter=python3
