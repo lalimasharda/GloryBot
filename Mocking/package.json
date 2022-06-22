@@ -16,7 +16,7 @@
     "underscore": "^1.6.0"
   },
   "dependencies": {
-    "got": "^9.6.0",
+    "got": "^11.8.5",
     "underscore": "^1.8.3"
   }
 }
